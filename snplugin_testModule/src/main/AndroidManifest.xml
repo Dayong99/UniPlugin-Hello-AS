@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.example.snplugin.testmodule"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<!--    <application android:name=".App"-->
+<!--        tools:replace="android:name">-->
+<!--        <activity-->
+<!--            android:name=".view.MainActivity"-->
+<!--            android:theme="@style/Theme.AppCompat.Light.NoActionBar"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
+<!--    </application>-->
+</manifest>
