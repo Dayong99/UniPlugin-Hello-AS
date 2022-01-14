@@ -1,5 +1,24 @@
 apply plugin: 'com.android.application'
-
+//apply plugin: 'maven-publish'
+//publishing {
+//    publications{
+//            maven(MavenPublication){
+//                groupId 'com.uniapp.test'
+//                artifactId 'unitest'
+//                version '0.0.1'
+//                artifacts "/libs/STS_KT_AndroidX-release-2.8.24.aar"
+//                pom.withXml{
+//
+//                }
+//            }
+//    }
+//
+//    repositories {
+//        maven {
+//            url "$buildDir/repo"
+//        }
+//    }
+//}
 android {
     compileSdkVersion 29
     buildToolsVersion '28.0.3'

@@ -30,7 +30,7 @@ repositories {
 dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.core:core-ktx:1.3.2'
-    implementation "androidx.preference:preference-ktx:1.1.1"
+    implementation "androidx.preference:preference-ktx:1.1.1"//kotlin依赖
 
     // compileOnly表示依赖不会打到模块里
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
@@ -48,7 +48,9 @@ dependencies {
 
     //安徽CA SDK
 //    implementation fileTree(dir: '../app/libs', include: ['sts-release.aar'])
-    compileOnly fileTree(dir: '../app/libs', include: ['unitidliveness-1.0.0.aar','STS_KT_AndroidX-release-2.8.24.aar'])
+    compileOnly fileTree(dir: '../app/libs', include: ['unitidliveness-1.0.0.aar', 'STS_KT_AndroidX-release-2.8.24.aar'])
+//    api files('libs/unitidliveness-1.0.0.aar')
+//    api files('libs/STS_KT_AndroidX-release-2.8.24.aar')
 
     compileOnly 'com.alibaba:fastjson:1.1.46.android'
 

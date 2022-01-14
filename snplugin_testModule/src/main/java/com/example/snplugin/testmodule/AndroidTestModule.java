@@ -1,8 +1,6 @@
 package com.example.snplugin.testmodule;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.ahca.sts.STShield;
 import com.ahca.sts.models.StsCompanyInfo;
@@ -22,51 +20,27 @@ import io.dcloud.feature.uniapp.common.UniModule;
 //测试app_key:8C987B3ABE59BB2BDA8727951C5A9342
 //测试secret_key:22611BFDB4C4E114874A0C9A4D24AA34
 public class AndroidTestModule extends UniModule {
-    private static SharedPreferences dsp;
+    private STShield stShield;
 
-    private static SharedPreferences getCacheManager() {
-        if (dsp == null) {
-            dsp = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+    private STShield getStShieldInstance(String mobileUserId) {
+        if (this.stShield == null) {
+            this.stShield = STShield.INSTANCE.init(this.mUniSDKInstance.getContext(), "http://117.71.58.71:66/", "8C987B3ABE59BB2BDA8727951C5A9342", "22611BFDB4C4E114874A0C9A4D24AA34")
+                    .initThemeColor(this.mUniSDKInstance.getContext(), this.mUniSDKInstance.getContext().getResources().getColor(R.color.stsColorPrimary))
+                    .initUseId(this.mUniSDKInstance.getContext(), mobileUserId);
         }
-        return dsp;
+        return this.stShield;
     }
 
-    @UniJSMethod
-    public void add(JSONObject json, UniJSCallback jsCallback) {
-        jsCallback.invoke(new JSONObject(){
-            {
-                put("1", "1");
-            }
-        });
-//        String mobileUserId = String.valueOf(json.get("mobileUserId"));
-//
-//        STShield.INSTANCE
-//                .init(this.mUniSDKInstance.getContext(), "http://117.71.58.71:66/", "8C987B3ABE59BB2BDA8727951C5A9342", "22611BFDB4C4E114874A0C9A4D24AA34")
-//                .initThemeColor(this.mUniSDKInstance.getContext(), this.mUniSDKInstance.getContext().getResources().getColor(R.color.stsColorPrimary))
-//                .initUseId(this.mUniSDKInstance.getContext(), mobileUserId);
-//
-//        STShield.INSTANCE.getDepartmentNo((Activity) this.mUniSDKInstance.getContext(), getDepartmentNoResult -> {
-//            System.out.println(getDepartmentNoResult);
-//            jsCallback.invoke(new JSONObject() {
-//                {
-//                    put("getDepartmentNoResult", getDepartmentNoResult);
-//                }
-//            });
-//            return null;
-//        });
-
-    }
-
+    /**
+     * 获取本地证书
+     */
     @UniJSMethod
     public void getLocalCert(JSONObject jsonObject, UniJSCallback jsCallback) {
         String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
 
-        STShield.INSTANCE
-                .init(this.mUniSDKInstance.getContext(), "http://117.71.58.71:66/", "8C987B3ABE59BB2BDA8727951C5A9342", "22611BFDB4C4E114874A0C9A4D24AA34")
-                .initThemeColor(this.mUniSDKInstance.getContext(), this.mUniSDKInstance.getContext().getResources().getColor(R.color.stsColorPrimary))
-                .initUseId(this.mUniSDKInstance.getContext(), mobileUserId);
+        STShield stShield = getStShieldInstance(mobileUserId);
 
-        if (!STShield.INSTANCE.isLocalCertExist(this.mUniSDKInstance.getContext())) {
+        if (!stShield.isLocalCertExist(this.mUniSDKInstance.getContext())) {
             jsCallback.invoke(new JSONObject() {
                 {
                     put("code", 500);
@@ -75,7 +49,8 @@ public class AndroidTestModule extends UniModule {
             });
         }
 
-        STShield.INSTANCE.getCert((Activity) this.mUniSDKInstance.getContext(), STShield.CERT_TYPE_SIGNCERT, getCertResult -> {
+        stShield.getCert((Activity) this.mUniSDKInstance.getContext(), STShield.CERT_TYPE_SIGNCERT, getCertResult -> {
+            System.out.println(getCertResult.getEnCert());
             jsCallback.invoke(new JSONObject() {
                 {
                     put("code", 200);
@@ -84,103 +59,115 @@ public class AndroidTestModule extends UniModule {
             });
             return null;
         });
-
     }
 
 
+    /**
+     * 获取企业证书
+     */
     @UniJSMethod
     public void applyCompanyCert(JSONObject jsonObject, UniJSCallback jsCallback) {
         String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
-        STShield.INSTANCE
-                .init(this.mUniSDKInstance.getContext(), "http://117.71.58.71:66/", "8C987B3ABE59BB2BDA8727951C5A9342", "22611BFDB4C4E114874A0C9A4D24AA34")
-                .initThemeColor(this.mUniSDKInstance.getContext(), this.mUniSDKInstance.getContext().getResources().getColor(R.color.stsColorPrimary))
-                .initUseId(this.mUniSDKInstance.getContext(), mobileUserId);
+        STShield stShield = getStShieldInstance(mobileUserId);
 
-//        StsCompanyInfo stsCompanyInfo1 = new StsCompanyInfo();
-//        stsCompanyInfo1.setCompanyName("企业名称");
-//        stsCompanyInfo1.setCardNum("110101199003077096");
-//        stsCompanyInfo1.setCompanyNo("12330100470100604B");
-//        stsCompanyInfo1.setDepartmentNo("123");
-//        stsCompanyInfo1.setPhoneNum("18815556655");
-//        stsCompanyInfo1.setUserEmail("123@qq.com");
-//        stsCompanyInfo1.setUserName("张三");
-//        STShield.INSTANCE.applyCompanyCert((Activity) this.mUniSDKInstance.getContext(), stsCompanyInfo1, applyCertResult -> {
-//            StsCompanyInfo stsCompanyInfo = applyCertResult.getStsCompanyInfo();
-//            System.out.println(applyCertResult.getResultMsg());
-//            jsCallback.invoke(new JSONObject() {
-//                {
-//                    put("code", "200");
-//                    put("msg", applyCertResult.getResultMsg());
-//                }
-//            });
-//            return null;
-//        });
+        StsCompanyInfo stsCompanyInfo = new StsCompanyInfo();
+        stsCompanyInfo.setCompanyName("杭州品茗信息技术有限公司");
+        stsCompanyInfo.setCompanyNo("91330108699830971L");
+        stsCompanyInfo.setCardNum("420111197009154095");
+        stsCompanyInfo.setDepartmentNo("91330108699830971L");
+        stsCompanyInfo.setPhoneNum("15515556655");
+        stsCompanyInfo.setUserEmail("2484030571@qq.com");
+        stsCompanyInfo.setUserName("莫绪军");
 
-        StsUserInfo stsUserInfo = new StsUserInfo();
-        stsUserInfo.setUserName("铁柱妈妈");
-        stsUserInfo.setCardNum("632323190605261984");
-        stsUserInfo.setCardType(STShield.CARD_TYPE_ID_CARD);
-        stsUserInfo.setPhoneNum("13324445543");
-        stsUserInfo.setUserEmail("1234@qq.com");
-        stsUserInfo.setUserCity("铁岭1");
-        STShield.INSTANCE.applyPersonalCert((Activity) this.mUniSDKInstance.getContext(), stsUserInfo, applyCertResult -> {
-            jsCallback.invoke(new JSONObject() {
-                {
-                    put("applyCertResult", applyCertResult);
-                }
-            });
-            return null;
-
-        });
-    }
-
-    @UniJSMethod
-    public void onCreate(JSONObject jsonObject, UniJSCallback jsCallback) {
-        String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
-        STShield.INSTANCE
-                .init(this.mUniSDKInstance.getContext(), "http://117.71.58.71:66/", "8C987B3ABE59BB2BDA8727951C5A9342", "22611BFDB4C4E114874A0C9A4D24AA34")
-                .initThemeColor(this.mUniSDKInstance.getContext(), this.mUniSDKInstance.getContext().getResources().getColor(R.color.stsColorPrimary))
-                .initUseId(this.mUniSDKInstance.getContext(), mobileUserId);
-
-//        StsCompanyInfo stsCompanyInfo1 = new StsCompanyInfo();
-//        stsCompanyInfo1.setCompanyName("杭州品茗信息技术有限公司");
-//        stsCompanyInfo1.setCardNum("420111197009154095");
-//        stsCompanyInfo1.setCompanyNo("91330108699830971L");
-//        stsCompanyInfo1.setDepartmentNo("123");
-//        stsCompanyInfo1.setPhoneNum("15515556655");
-//        stsCompanyInfo1.setUserEmail("2484030571@qq.com");
-//        stsCompanyInfo1.setUserName("莫绪军");
-//        STShield.INSTANCE.applyCompanyCert((Activity) this.mUniSDKInstance.getContext(), stsCompanyInfo1, applyCertResult -> {
-//            StsCompanyInfo stsCompanyInfo = applyCertResult.getStsCompanyInfo();
-//            System.out.println(applyCertResult.getResultMsg());
-//            jsCallback.invoke(new JSONObject() {
-//                {
-//                    put("code", "200");
-//                    put("msg", applyCertResult.getResultMsg());
-//                }
-//            });
-//            return null;
-//        });
-
-        StsUserInfo stsUserInfo = new StsUserInfo();
-        stsUserInfo.setUserName("铁柱妈妈");
-        stsUserInfo.setCardNum("632323190605261984");
-        stsUserInfo.setCardType(STShield.CARD_TYPE_ID_CARD);
-        stsUserInfo.setPhoneNum("13324445543");
-        stsUserInfo.setUserEmail("1234@qq.com");
-        stsUserInfo.setUserCity("铁岭1");
-        STShield.INSTANCE.applyPersonalCert((Activity) this.mUniSDKInstance.getContext(), stsUserInfo, applyCertResult -> {
-            System.out.println(applyCertResult.getResultMsg());
+        stShield.applyCompanyCert((Activity) this.mUniSDKInstance.getContext(), stsCompanyInfo, applyCertResult -> {
+            System.out.println(applyCertResult);
             jsCallback.invoke(new JSONObject() {
                 {
                     put("code", "200");
-                    put("applyCertResult", applyCertResult);
-                    put("msg", applyCertResult.getResultMsg());
+                    put("msg", applyCertResult);
                 }
             });
             return null;
-
         });
 
+
+    }
+
+    /**
+     * 获取个人证书
+     */
+    @UniJSMethod
+    public void applyPersonalCert(JSONObject jsonObject, UniJSCallback jsCallback) {
+        String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
+        STShield stShield = getStShieldInstance(mobileUserId);
+
+        StsUserInfo stsUserInfo = new StsUserInfo();
+        stsUserInfo.setUserName("铁柱妈妈");
+        stsUserInfo.setCardNum("632323190605261984");
+        stsUserInfo.setCardType(STShield.CARD_TYPE_ID_CARD);
+        stsUserInfo.setPhoneNum("13324445543");
+        stsUserInfo.setUserEmail("1234@qq.com");
+        stsUserInfo.setUserCity("铁岭1");
+        stShield.applyPersonalCert((Activity) this.mUniSDKInstance.getContext(), stsUserInfo, applyCertResult -> {
+            jsCallback.invoke(new JSONObject() {
+                {
+                    put("applyCertResult", applyCertResult);
+                }
+            });
+            return null;
+        });
+    }
+
+    /**
+     * 检查证书状态
+     */
+    @UniJSMethod
+    public void checkCert(JSONObject jsonObject, UniJSCallback jsCallback) {
+        String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
+        STShield stShield = getStShieldInstance(mobileUserId);
+        stShield.checkCert((Activity) this.mUniSDKInstance.getContext(), commonResult -> {
+            jsCallback.invoke(new JSONObject() {
+                {
+                    put("commonResult", commonResult);
+                }
+            });
+            return null;
+        });
+    }
+
+    /**
+     * 更新个人证书
+     */
+    @UniJSMethod
+    public void updatePersonalCert(JSONObject jsonObject, UniJSCallback jsCallback) {
+        String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
+        STShield stShield = getStShieldInstance(mobileUserId);
+        StsUserInfo stsUserInfo = JSONObject.parseObject(String.valueOf(jsonObject), StsUserInfo.class);
+        stShield.updatePersonalCert((Activity) this.mUniSDKInstance.getContext(), stsUserInfo, commonResult -> {
+            jsCallback.invoke(new JSONObject() {
+                {
+                    put("commonResult", commonResult);
+                }
+            });
+            return null;
+        });
+    }
+
+    /**
+     * 更新企业证书
+     */
+    @UniJSMethod
+    public void updateCompanyCert(JSONObject jsonObject, UniJSCallback jsCallback) {
+        String mobileUserId = String.valueOf(jsonObject.get("mobileUserId"));
+        STShield stShield = getStShieldInstance(mobileUserId);
+        StsCompanyInfo stsCompanyInfo = JSONObject.parseObject(String.valueOf(jsonObject), StsCompanyInfo.class);
+        stShield.updateCompanyCert((Activity) this.mUniSDKInstance.getContext(), stsCompanyInfo, commonResult -> {
+            jsCallback.invoke(new JSONObject() {
+                {
+                    put("commonResult", commonResult);
+                }
+            });
+            return null;
+        });
     }
 }
